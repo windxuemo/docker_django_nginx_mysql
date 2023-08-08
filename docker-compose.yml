@@ -1,0 +1,31 @@
+services:
+  mysql:
+    build: docker/mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ./sql_data:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=django
+    healthcheck:
+      test: "exit 0"
+  web:
+    build: ./docker/nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./app:/var/www/html
+    working_dir: /etc/nginx
+    depends_on:
+      - python
+
+  python:
+    build: ./docker/python
+    volumes:
+      - ./app:/var/www/html
+    working_dir: /var/www/html
+    depends_on:
+      mysql:
+        condition: service_healthy
+
