@@ -10,6 +10,24 @@ services:
       - MYSQL_DATABASE=django
     healthcheck:
       test: "exit 0"
+  rabbitmq:
+    build:
+      context: docker/rabbitmq
+      dockerfile: Dockerfile
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - ./rabbitmq_data:/var/lib/rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: rabbitmq
+      RABBITMQ_DEFAULT_PASS: password
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 30s
+      retries: 10
+
   web:
     build: ./docker/nginx
     ports:
@@ -27,5 +45,7 @@ services:
     working_dir: /var/www/html
     depends_on:
       mysql:
+        condition: service_healthy
+      rabbitmq:
         condition: service_healthy
 
