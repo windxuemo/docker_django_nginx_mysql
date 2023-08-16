@@ -1,2 +1,3 @@
 /sql_data
 /rabbitmq_data
+**/__pycache__/
