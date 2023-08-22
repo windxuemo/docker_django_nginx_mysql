@@ -1,3 +1,5 @@
 /sql_data
 /rabbitmq_data
+/mongodb_data
 **/__pycache__/
+**/migrations/

@@ -10,23 +10,45 @@ services:
       - MYSQL_DATABASE=django
     healthcheck:
       test: "exit 0"
+
+  mongo:
+    build: docker/mongo
+    ports:
+      - 27018:27017
+    volumes:
+      - ./mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
   rabbitmq:
     build:
       context: docker/rabbitmq
       dockerfile: Dockerfile
     ports:
-      - "5672:5672"
-      - "15672:15672"
+      - "5673:5672"
+      - "15673:15672"
     volumes:
       - ./rabbitmq_data:/var/lib/rabbitmq
     environment:
       RABBITMQ_DEFAULT_USER: rabbitmq
       RABBITMQ_DEFAULT_PASS: password
     healthcheck:
-      test: rabbitmq-diagnostics -q ping
-      interval: 30s
-      timeout: 30s
-      retries: 10
+      test: [ "CMD", "nc", "-z", "localhost", "5672" ]
+      timeout: 5s
+      retries: 1
+
+
+
+  python:
+    build: ./docker/python
+    volumes:
+      - ./app:/var/www/html
+    working_dir: /var/www/html
 
   web:
     build: ./docker/nginx
@@ -37,15 +59,4 @@ services:
     working_dir: /etc/nginx
     depends_on:
       - python
-
-  python:
-    build: ./docker/python
-    volumes:
-      - ./app:/var/www/html
-    working_dir: /var/www/html
-    depends_on:
-      mysql:
-        condition: service_healthy
-      rabbitmq:
-        condition: service_healthy
 
