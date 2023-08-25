@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/extract/', include("HelloWorld.urls")),
     path('api/analyze/', include("Analyze.urls")),
+    path('api/emulate/', include("Emulate.urls"))
 ]
