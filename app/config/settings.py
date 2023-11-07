@@ -38,9 +38,12 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    'HelloWorld',
+    'Extract',
     'Analyze',
-    'Emulate'
+    'Emulate',
+    'Useremu',
+    'AnalyzeBinary',
+    'Login'
 ]
 
 MIDDLEWARE = [

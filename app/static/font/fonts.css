@@ -1,0 +1,40 @@
+@font-face {
+    font-family: fzht;
+    src: url('./fzht.ttf') format('truetype');
+}
+@font-face {
+    font-family: siyuansun;
+    src: url('./SourceHanSerifCN-Regular-1.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuansun-bold;
+    src: url('./SourceHanSerifCN-Bold-2.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuansun-medium;
+    src: url('./SourceHanSerifCN-Medium-6.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuanhei-regular;
+    src: url('./SourceHanSans-Regular.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuanhei-light;
+    src: url('./SourceHanSans-Light.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuanhei-normal;
+    src: url('./SourceHanSans-Normal.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuanhei-medium;
+    src: url('./SourceHanSans-Medium.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuanhei-heavy;
+    src: url('./SourceHanSans-Heavy.otf') format('truetype');
+}
+@font-face {
+    font-family: siyuanhei-bold;
+    src: url('./SourceHanSans-Bold.otf') format('truetype');
+}

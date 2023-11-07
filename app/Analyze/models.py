@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 
 class AnalyzeFirmwareTask(models.Model):
@@ -10,6 +11,7 @@ class AnalyzeFirmwareTask(models.Model):
     ]
 
     firmware_name = models.CharField(max_length=100)  # 存储固件名称
+    created_at = models.DateTimeField(default=timezone.now)
     file_id = models.CharField(max_length=100)  # 存储 GridFS 文件 ID
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     firmware_result = models.JSONField(null=True)  # 存储固件分析结果的 JSON 数据

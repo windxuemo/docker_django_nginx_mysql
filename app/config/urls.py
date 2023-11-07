@@ -18,7 +18,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/extract/', include("HelloWorld.urls")),
+    path('api/extract/', include("Extract.urls")),
     path('api/analyze/', include("Analyze.urls")),
-    path('api/emulate/', include("Emulate.urls"))
+    path('api/analyze-binary/', include("AnalyzeBinary.urls")),
+    path('api/emulate/', include("Emulate.urls")),
+    path('api/user-emulate/', include("Useremu.urls")),
+    path('api/auth/', include("Login.urls"))
 ]

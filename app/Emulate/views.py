@@ -2,9 +2,13 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 from django.http import HttpResponse
+from django.utils import timezone
+from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+
 
 from .models import EmulateFirmwareTask
-from HelloWorld.models import ExtractFirmwareTask
+from Extract.models import ExtractFirmwareTask
 
 from gridfs import GridFS
 from pymongo import MongoClient
@@ -13,6 +17,7 @@ from .tasks import celery_send_task
 from .tasks import celery_kill_task
 import json
 
+@login_required(login_url='/api/auth/login')
 @csrf_exempt
 def create_emulate_firmware_task(request):
     if request.method == 'POST':
@@ -44,6 +49,7 @@ def create_emulate_firmware_task(request):
                 emulate_task.file_id=str(file_id)
                 emulate_task.firmware_name=firmware_file.name
                 emulate_task.status = 'emulating'
+                emulate_task.created_at = timezone.now()
                 emulate_task.save()
 
                 celery_send_task(emulate_task.id)
@@ -57,10 +63,9 @@ def create_emulate_firmware_task(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+@login_required(login_url='/api/auth/login')
 @csrf_exempt
 def select_and_create_task(request):
-    import pdb
-    pdb.set_trace()
     if request.method == 'POST':
         try:
             extract_task_id = request.POST.get('task_id')
@@ -98,6 +103,7 @@ def select_and_create_task(request):
                 emulate_task.file_id=str(file_id)
                 emulate_task.firmware_name=firmware_file_name
                 emulate_task.status = 'emulating'
+                emulate_task.created_at = timezone.now()
                 emulate_task.save()
 
                 celery_send_task(emulate_task.id)
@@ -111,10 +117,9 @@ def select_and_create_task(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+@login_required(login_url='/api/auth/login')
 @csrf_exempt
 def terminate_firmware_task(request):
-    import pdb
-    pdb.set_trace()
     if request.method == 'POST':
         try:
             task_id = request.POST.get('task_id')
@@ -134,6 +139,7 @@ def terminate_firmware_task(request):
 
 
 
+@login_required(login_url='/api/auth/login')
 def download_firmware(request, task_id):
     try:
         emulate_task = EmulateFirmwareTask.objects.get(id=task_id)
@@ -171,6 +177,7 @@ def download_firmware(request, task_id):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+@login_required(login_url='/api/auth/login')
 def update_result(request):
     if request.method == 'POST':
         try:
@@ -203,14 +210,23 @@ def update_result(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+@login_required(login_url='/api/auth/login')
 def list_all_task(request, task_id=None):
-    tasks = EmulateFirmwareTask.objects.all()
-    task_list = [{'id': task.id, 'firmware_name':task.firmware_name, 'status': task.status, 'nginx_ip': task.nginx_ip} for task in tasks]
-    return JsonResponse({'tasks': task_list})
+    page = request.GET.get('page')
+    items_per_page = request.GET.get('items_per_page')
+
+    tasks_data = EmulateFirmwareTask.objects.all().order_by("id")
+    paginator = Paginator(tasks_data, items_per_page)
+    items = paginator.get_page(page)
+
+    total_items = paginator.count
+    task_list = [{'id': item.id, 'firmware_name': item.firmware_name, 'status': item.status, 'created_at': item.created_at, 'nginx_ip': item.nginx_ip} for item in items]
+    return JsonResponse({'tasks': task_list, 'total_items': total_items})
 
 
 
 
+@login_required(login_url='/api/auth/login')
 def list_task(request, task_id):
 
     task = EmulateFirmwareTask.objects.get(id=task_id)
@@ -218,11 +234,12 @@ def list_task(request, task_id):
     return JsonResponse(task)
 
 
+@login_required(login_url='/api/auth/login')
 @csrf_exempt
 def delete_task(request, task_id):
     if request.method == 'POST':
         try:
-            task = AnalyzeFirmwareTask.objects.get(id=task_id)
+            task = EmulateFirmwareTask.objects.get(id=task_id)
             file_id = task.file_id
             # 连接到 MongoDB
             mongo_config = settings.MONGO_CONFIG
@@ -245,7 +262,7 @@ def delete_task(request, task_id):
 
             task.delete()
             return JsonResponse({'message': '任务删除成功'})
-        except AnalyzeFirmwareTask.DoesNotExist:
+        except EmulateFirmwareTask.DoesNotExist:
             return JsonResponse({'error': '任务不存在'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
