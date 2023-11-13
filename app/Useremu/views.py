@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from .models import UserEmulateTask
 from Extract.models import ExtractFirmwareTask
 
+from urllib.parse import quote
 from gridfs import GridFS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -179,7 +180,7 @@ def download_bin(request, task_id):
 
 
             response = HttpResponse(binary_file_content, content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={binary_file_name}'
+            response['Content-Disposition'] = f'attachment; filename={quote(binary_file_name)}'
             return response
 
         else:

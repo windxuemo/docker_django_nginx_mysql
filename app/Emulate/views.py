@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from .models import EmulateFirmwareTask
 from Extract.models import ExtractFirmwareTask
 
+from urllib.parse import quote
 from gridfs import GridFS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -169,7 +170,7 @@ def download_firmware(request, task_id):
 
 
             response = HttpResponse(firmware_file_content, content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={firmware_file_name}'
+            response['Content-Disposition'] = f'attachment; filename={quote(firmware_file_name)}'
             return response
 
         else:
@@ -199,6 +200,10 @@ def update_result(request):
             elif status == 'failure':
                 emulate_task = EmulateFirmwareTask.objects.get(id=task_id)
                 emulate_task.status = 'failed'
+                emulate_task.save()
+            elif status == 'terminated':
+                emulate_task = EmulateFirmwareTask.objects.get(id=task_id)
+                emulate_task.status = 'terminated'
                 emulate_task.save()
 
 

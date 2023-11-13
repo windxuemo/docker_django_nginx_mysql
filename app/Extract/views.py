@@ -12,6 +12,7 @@ from gridfs import GridFS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from django.utils import timezone
+from urllib.parse import quote
 
 from .tasks import celery_send_task
 
@@ -141,7 +142,7 @@ def download_extract_firmware(request, task_id):
         client.close()
 
         response = HttpResponse(firmware_file_content, content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename={firmware_file_name}'
+        response['Content-Disposition'] = f'attachment; filename={quote(firmware_file_name)}'
 
         return response
     except ExtractFirmwareTask.DoesNotExist:
@@ -207,7 +208,7 @@ def get_task_result(request, task_id):
         client.close()
 
         response = HttpResponse(extracted_firmware_file_content, content_type='application/octet-stream')
-        response['Content-Disposition'] = f'attachment; filename={extracted_firmware_file_name}'
+        response['Content-Disposition'] = f'attachment; filename={quote(extracted_firmware_file_name)}'
 
         return response
     except ExtractFirmwareTask.DoesNotExist:

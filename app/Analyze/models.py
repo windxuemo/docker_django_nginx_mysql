@@ -14,6 +14,7 @@ class AnalyzeFirmwareTask(models.Model):
     created_at = models.DateTimeField(default=timezone.now)
     file_id = models.CharField(max_length=100)  # 存储 GridFS 文件 ID
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
+    arch = models.CharField(max_length=100, null=True)  # 存储 GridFS 文件 ID
     firmware_result = models.JSONField(null=True)  # 存储固件分析结果的 JSON 数据
 
     def __str__(self):

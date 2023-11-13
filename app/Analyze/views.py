@@ -9,6 +9,7 @@ from django.core.paginator import Paginator
 from .models import AnalyzeFirmwareTask
 from Extract.models import ExtractFirmwareTask
 
+from urllib.parse import quote
 from gridfs import GridFS
 from pymongo import MongoClient
 from bson.objectid import ObjectId
@@ -147,7 +148,7 @@ def download_firmware(request, task_id):
 
 
             response = HttpResponse(zip_file_content, content_type='application/octet-stream')
-            response['Content-Disposition'] = f'attachment; filename={zip_file_name}'
+            response['Content-Disposition'] = f'attachment; filename={quote(zip_file_name)}'
             return response
 
         else:
@@ -166,9 +167,11 @@ def update_result(request):
             status = request_data.get('status')
             if status == 'success':
                 result_data = request_data.get('result_data')
+                arch_info = request_data.get('arch')
 
                 analysis_task = AnalyzeFirmwareTask.objects.get(id=task_id)
                 analysis_task.firmware_result = result_data
+                analysis_task.arch = arch_info
                 analysis_task.status = 'completed'
                 analysis_task.save()
             elif status == 'failure':
