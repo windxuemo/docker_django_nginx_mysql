@@ -1,9 +1,10 @@
 from django.urls import path
-from .views import create_extract_firmware_task, update_extract_firmware_result, download_extract_firmware, get_all_tasks, get_completed_tasks, get_task_result, delete_extract_firmware_task
+from .views import create_extract_firmware_task, update_extract_firmware_result, download_extract_firmware, get_all_tasks, get_completed_tasks, get_task_result, delete_extract_firmware_task, re_execute_task
 
 urlpatterns = [
     # 创建任务接口
     path('create-task/', create_extract_firmware_task, name='create-task'),
+    path('re-execute-task/', re_execute_task, name='re-create-task'),
 
     # 下载固件接口
     path('download-firmware/<int:task_id>/', download_extract_firmware, name='download-firmware'),

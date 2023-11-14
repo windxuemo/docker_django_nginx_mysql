@@ -64,6 +64,15 @@ def create_emulate_firmware_task(request):
     return JsonResponse({'error': 'Invalid request method'}, status=405)
 
 
+
+@login_required(login_url='/api/auth/login')
+def re_execute_task(request):
+    task_id = request.POST.get('task_id')
+    celery_send_task(task_id)
+    return JsonResponse({'message': '开始执行任务', 'task_id': task_id})
+
+
+
 @login_required(login_url='/api/auth/login')
 @csrf_exempt
 def select_and_create_task(request):

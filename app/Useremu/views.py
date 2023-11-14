@@ -82,15 +82,20 @@ def run_binary(request):
         return JsonResponse({'status': 'running', 'task_id': task_id})
 
 
+
 @login_required(login_url='/api/auth/login')
 def debug_binary(request):
     if request.method == 'POST':
         task_id = request.POST.get('task_id')
         args = request.POST.getlist('args')
 
+        user_emulate_task = UserEmulateTask.objects.get(id=task_id)
+        user_emulate_task.status = 'emulating'
+        user_emulate_task.save()
 
         celery_send_task(task_id, args)
         return JsonResponse({'status': 'debugging', 'task_id': task_id})
+    return JsonResponse({'task_id': task_id, 'status': user_emulate_task.status})
 
 @login_required(login_url='/api/auth/login')
 def update_result(request):
@@ -111,7 +116,7 @@ def update_result(request):
                 emulate_task.debug_port = debug_port
                 emulate_task.pid = pid
                 emulate_task.save()
-            elif status == 'failure':
+            elif status == 'failed':
                 emulate_task = UserEmulateTask.objects.get(id=task_id)
                 emulate_task.status = 'failed'
                 emulate_task.save()
