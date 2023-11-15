@@ -143,14 +143,20 @@ def terminate_task(request):
         try:
             task_id = request.POST.get('task_id')
             task = UserEmulateTask.objects.get(id=task_id)
-            pid = task.pid
+            user_emulate_task = UserEmulateTask.objects.get(id=task_id)
+            pid = user_emulate_task.pid
+
+            user_emulate_task.status = 'terminating'
+            user_emulate_task.save()
+
             celery_kill_task(task_id, pid)
+
 
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
 
-    return JsonResponse({'message': '任务已terminated', 'task_id': task_id})
+    return JsonResponse({'message': '任务已terminated', 'status': task.status, 'task_id': task_id})
 
 
 
