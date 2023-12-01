@@ -43,7 +43,8 @@ INSTALLED_APPS = [
     'Emulate',
     'Useremu',
     'AnalyzeBinary',
-    'Login'
+    'Login',
+    'Repository'
 ]
 
 MIDDLEWARE = [

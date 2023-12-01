@@ -23,5 +23,6 @@ urlpatterns = [
     path('api/analyze-binary/', include("AnalyzeBinary.urls")),
     path('api/emulate/', include("Emulate.urls")),
     path('api/user-emulate/', include("Useremu.urls")),
-    path('api/auth/', include("Login.urls"))
+    path('api/auth/', include("Login.urls")),
+    path('api/repository/', include("Repository.urls"))
 ]
