@@ -35,16 +35,21 @@ def firmware_upload(request):
     fs = GridFS(db)
 
     firmware_files = request.FILES.getlist('files')
-    vendor = request.GET.get('vendor')
+    print("---------1111-----")
+    vendor = request.POST.get('vendor')
+    print("---------222-----")
+    print(vendor)
 
     for firmware_file in firmware_files:
 
         firmware_name = firmware_file.name
+        print(firmware_name)
+        print(vendor)
         # 存储固件文件到 GridFS
         file_id = fs.put(firmware_file.read(), filename=firmware_file.name)
 
         # 创建任务记录
-        firmware = FirmwareRepository.objects.create(file_id=str(file_id), firmware_name=firmware_name, vendor=vendor, created_at = timezone.now())
+        firmware = FirmwareRepository.objects.create(file_id=str(file_id), name=firmware_name, vendor=vendor, created_at = timezone.now())
 
     # 关闭连接
     client.close()
@@ -78,6 +83,21 @@ def firmware_list(request):
     total_items = paginator.count
     data_list = [{'id': item.id, 'firmware_name': item.name, 'vendor': item.vendor, 'created_at': item.created_at} for item in items]
     return JsonResponse({'firmwares': data_list, 'total_items': total_items})
+
+
+@login_required(login_url='/api/auth/login')
+def update_vendor(request):
+    firmware_id = request.POST.get('id')
+    vendor = request.POST.get('vendor')
+
+    firmware = FirmwareRepository.objects.get(id=firmware_id)
+
+    firmware.vendor = vendor
+    firmware.save()
+
+    return JsonResponse({'message': 'Update successful', 'id': firmware_id, 'vendor': vendor, })
+
+
 
 
 @login_required(login_url='/api/auth/login')
